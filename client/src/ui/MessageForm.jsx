@@ -1,137 +1,103 @@
 "use client";
 
 import { useMessages } from "@/providers/MessageContextProvider";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { FaPaperclip, FaImage, FaVideo, FaMicrophone } from "react-icons/fa"; // Import icons
 import Menu from "./Menu";
 
 const MessageForm = () => {
   const [prompt, setPrompt] = useState("");
-  const [image, setImage] = useState(null);
-  const [video, setVideo] = useState(null);
-  const [audio, setAudio] = useState(null);
-  const audioRef = useRef(null);
+  const [file, setFile] = useState(null);
+  const [showUploadMenu, setShowUploadMenu] = useState(false);
   const { addMessage } = useMessages();
 
-  const handleImageChange = (e) => {
-    console.log("Image changed:", e.target.files[0]);
-    setImage(e.target.files[0]);
-  };
-
-  const handleVideoChange = (e) => {
-    setVideo(e.target.files[0]);
-  };
-
-  const handleAudioChange = (e) => {
-    setAudio(e.target.files[0]);
-  };
-
-  const handleAudioRecord = () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          const recorder = new MediaRecorder(stream);
-          recorder.start();
-
-          const chunks = [];
-          recorder.ondataavailable = (e) => chunks.push(e.data);
-          recorder.onstop = () => {
-            const blob = new Blob(chunks, { type: "audio/wav" }); // Or appropriate type
-            setAudio(blob);
-          };
-
-          audioRef.current.onclick = () => {
-            recorder.stop();
-            audioRef.current.onclick = handleAudioRecord; // Reset onclick
-            audioRef.current.textContent = "Record Audio";
-          };
-          audioRef.current.onclick(); // Stop Recording
-          audioRef.current.textContent = "Stop Recording";
-        })
-        .catch((err) => console.error("Error accessing microphone:", err));
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile({ file: selectedFile, preview: URL.createObjectURL(selectedFile) });
     }
+    setShowUploadMenu(false); // Hide menu after selection
   };
 
+  // Handle message submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!prompt.trim() && !file) return; // Prevent sending empty messages
 
     const formData = new FormData();
     formData.append("prompt", prompt);
-    if (image) formData.append("image", image);
-    if (video) formData.append("video", video);
-    if (audio) formData.append("audio", audio);
+    if (file) formData.append("file", file.file);
 
-    try {
-      addMessage({ role: "user", content: prompt }, formData);
+    addMessage({ role: "user", content: prompt }, formData);
 
-      setPrompt("");
-      setImage(null);
-      setVideo(null);
-      setAudio(null);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    setPrompt(""); // Clear input
+    setFile(null); // Clear file selection
   };
 
   return (
-    <form
-      className="fixed bottom-0 left-0 right-0 z-10 bg-gray-200 shadow-lg"
-      onSubmit={handleSubmit}
-    >
-      <div className="supports-backdrop-blur:bg-white/95 h-[130px] max-w-4xl mx-auto rounded-xl p-5 backdrop-blur">
-        {/* <span className="absolute bg-transparent text-sm left-5 top-1">
-          {image && <span className="text-green-500">{image.f}</span>}
-        </span> */}
+    <form className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t flex items-center gap-4" onSubmit={handleSubmit}>
+      
+      {/* Upload Button with Pop-up Menu */}
+      <div className="relative">
+        <button type="button" onClick={() => setShowUploadMenu(!showUploadMenu)} className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+          <FaPaperclip size={20} />
+        </button>
 
-        <Textarea
-          name="content"
-          placeholder="Enter your query here..."
-          rows={3}
-          value={prompt}
-          autoFocus
-          className="border-0 !p-3 text-gray-900 shadow-none ring-1 ring-gray-300/40 backdrop-blur focus:outline-none focus:ring-gray-300/80 dark:bg-gray-800/80 dark:text-white dark:placeholder-gray-400 dark:ring-0"
-          onChange={(e) => setPrompt(e.target.value)}
-        />
-        <div className="absolute top-9 bottom-0 right-8">
-          <div className="flex w-full justify-end gap-6">
-            <Menu
-              handleImageChange={handleImageChange}
-              handleVideoChange={handleVideoChange}
-              handleAudioChange={handleAudioChange}
-            />
-
-            <Button
-              color="secondary"
-              className={cn(
-                "px-8 py-4",
-                !prompt.length && "opacity-50 cursor-not-allowed"
-              )}
-              type="submit"
-              size="small"
-              disabled={!prompt}
-            >
-              Send
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="ml-1 h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                />
-              </svg>
-            </Button>
+        {/* Upload Menu */}
+        {showUploadMenu && (
+          <div className="absolute bottom-12 left-0 bg-white shadow-lg border rounded-lg p-2 flex flex-col gap-2">
+            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+              <FaImage /> Image
+              <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+              <FaVideo /> Video
+              <input type="file" accept="video/*" className="hidden" onChange={handleFileChange} />
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+              <FaMicrophone /> Audio
+              <input type="file" accept="audio/*" className="hidden" onChange={handleFileChange} />
+            </label>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Input Field */}
+      <Textarea
+        name="content"
+        placeholder="Enter your query here..."
+        rows={2}
+        value={prompt}
+        className="flex-grow p-3 border rounded-lg shadow-sm focus:outline-none"
+        onChange={(e) => setPrompt(e.target.value)}
+      />
+
+      {/* File Preview */}
+      {file && (
+        <div className="relative">
+          <img src={file.preview} alt="Uploaded" className="h-12 w-12 rounded-md object-cover" />
+          <button
+            className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+            onClick={() => setFile(null)}
+            type="button"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Send Button */}
+      <Button
+        type="submit"
+        className={cn("px-6 py-2 bg-blue-500 text-white rounded-lg", (!prompt && !file) && "opacity-50 cursor-not-allowed")}
+        disabled={!prompt && !file}
+      >
+        Send ➤
+      </Button>
     </form>
   );
 };

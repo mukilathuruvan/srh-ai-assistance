@@ -1,0 +1,10 @@
+flask
+flask-SQLAlchemy
+flask-cors
+flask_sqlalchemy
+python-dotenv
+requests
+mysql-connector-python
+gunicorn
+vertexai
+openai

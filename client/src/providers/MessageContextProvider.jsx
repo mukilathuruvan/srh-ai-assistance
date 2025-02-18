@@ -1,6 +1,6 @@
 "use client";
 
-import { chatWithBot } from "@/api";
+import { chatWithBot, convertToAudio } from "@/api";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ChatsContext = createContext({});
@@ -55,9 +55,27 @@ export function MessagesProvider({ children }) {
     }
   };
 
+  const speakMessage = async (message, language) => {
+    try {
+      const data = await convertToAudio(message, language);
+      if (!data) return;
+
+      const audio = new Audio(`data:audio/mpeg;base64,${data.audio}`);
+      audio.play();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
+  };
+
   return (
     <ChatsContext.Provider
-      value={{ gptMessages, geminiMessages, addMessage, isLoadingAnswer }}
+      value={{
+        gptMessages,
+        geminiMessages,
+        addMessage,
+        isLoadingAnswer,
+        speakMessage,
+      }}
     >
       {children}
     </ChatsContext.Provider>

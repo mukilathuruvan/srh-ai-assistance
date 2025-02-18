@@ -16,7 +16,10 @@ const MessageForm = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile({ file: selectedFile, preview: URL.createObjectURL(selectedFile) });
+      setFile({
+        file: selectedFile,
+        preview: URL.createObjectURL(selectedFile),
+      });
     }
   };
 
@@ -76,7 +79,10 @@ const MessageForm = () => {
       {/* Send Button */}
       <Button
         type="submit"
-        className={cn("px-6 py-2 bg-blue-500 text-white rounded-lg", (!prompt && !file) && "opacity-50 cursor-not-allowed")}
+        className={cn(
+          "px-6 py-2 bg-blue-500 text-white rounded-lg",
+          !prompt && !file && "opacity-50 cursor-not-allowed"
+        )}
         disabled={!prompt && !file}
       >
         Send➤

@@ -1,10 +1,8 @@
-import base64
-import vertexai
-import re
-from vertexai.generative_models import GenerativeModel, SafetySetting, Part
-from werkzeug.serving import run_simple
-import time
+import openai
 import os
+import re
+import time
+from werkzeug.serving import run_simple
 
 system_instruction = [
     """
@@ -93,57 +91,12 @@ system_instruction = [
     Remember to always prioritize accuracy and provide information sourced from official SRH University resources.  If you are unsure, it is better to say you don't know than to provide potentially incorrect information.  Be precise, step-by-step, and provide clear guidance.
     """,
 ]
-
-PROJECT_ID = os.getenv("GEMINI_PROJECT_ID")
-BUCKET_NAME = os.getenv("GEMINI_BUCKET_NAME")
-LOCATION = os.getenv("GEMINI_LOCATION")
-API_ENDPOINT = os.getenv("SRH_API_ENDPOINT")
-APP_MODEL = os.getenv("GEMINI_APP_MODEL")
+openai.api_key = ""
 
 
-generation_config = {
-    "max_output_tokens": 8192,
-    "temperature": 1,
-    "top_p": 0.95,
-}
-
-
-safety_settings = [
-    SafetySetting(
-        category=SafetySetting.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold=SafetySetting.HarmBlockThreshold.OFF,
-    ),
-    SafetySetting(
-        category=SafetySetting.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold=SafetySetting.HarmBlockThreshold.OFF,
-    ),
-    SafetySetting(
-        category=SafetySetting.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold=SafetySetting.HarmBlockThreshold.OFF,
-    ),
-    SafetySetting(
-        category=SafetySetting.HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold=SafetySetting.HarmBlockThreshold.OFF,
-    ),
-]
-
-
-class AppGemini:
+class AppOpenAI:
     def __init__(self):
-        self.model = None
-        self.initialize()
-
-    def initialize(self):
-        vertexai.init(
-            project=PROJECT_ID,
-            location=LOCATION,
-            api_endpoint=API_ENDPOINT,
-        )
-        path = self.prepare_endpoint_path()
-        self.model = GenerativeModel(path, system_instruction=system_instruction)
-
-    def prepare_endpoint_path(self):
-        return f"projects/{PROJECT_ID}/locations/{LOCATION}/endpoints/{APP_MODEL}"
+        self.client = openai.ChatCompletion
 
     def validate_prompt(self, prompt):
         if not prompt:
@@ -166,28 +119,30 @@ class AppGemini:
 
     def generate_response(self, prompt: str):
         try:
-            if not self.model:
-                self.initialize()
-
             if not self.validate_prompt(prompt):
                 return None
 
             start_time = time.time()
-            chat = self.model.start_chat()
-            response = chat.send_message(
-                prompt,
-                generation_config=generation_config,
-                safety_settings=safety_settings,
+
+            response = self.client.create(
+                model="ft:gpt-4o-mini-2024-07-18:personal::B2IoJDWl",
+                messages=[
+                    {"role": "system", "content": system_instruction[0]},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=8192,
+                temperature=1,
+                top_p=0.95,
             )
 
             end_time = time.time()
             response_time = round(end_time - start_time, 2)
 
             return {
-                "content": response.candidates[0].content.parts[0].text,
+                "content": response["choices"][0]["message"]["content"],
                 "response_time": response_time,
             }
 
         except Exception as e:
-            print(f"Error generating app gemini response: {e}")
+            print(f"Error generating OpenAI response: {e}")
             return None

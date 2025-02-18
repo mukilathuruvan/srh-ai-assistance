@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FaPaperclip, FaImage, FaVideo, FaMicrophone } from "react-icons/fa"; // Import icons
-import Menu from "./Menu";
 
 const MessageForm = () => {
   const [prompt, setPrompt] = useState("");
@@ -29,17 +28,16 @@ const MessageForm = () => {
   // Handle message submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    speakMessage("welcome", "de");
-    // if (!prompt.trim() && !file) return; // Prevent sending empty messages
+    if (!prompt.trim() && !file) return; // Prevent sending empty messages
 
-    // const formData = new FormData();
-    // formData.append("prompt", prompt);
-    // if (file) formData.append("file", file.file);
+    const formData = new FormData();
+    formData.append("prompt", prompt);
+    if (file) formData.append("file", file.file);
 
-    // addMessage({ role: "user", content: prompt }, formData);
+    addMessage({ role: "user", content: prompt }, formData);
 
-    // setPrompt(""); // Clear input
-    // setFile(null); // Clear file selection
+    setPrompt(""); // Clear input
+    setFile(null); // Clear file selection
   };
 
   return (

@@ -26,9 +26,7 @@ def speak():
         return jsonify({"error": "No text provided"}), 400
 
     try:
-        translated_text = (
-            translate_text(text, language_code) if language_code != "en-US" else text
-        )
+        translated_text = translate_text(text, language_code)
         audio_content = synthesize_speech(translated_text)
 
         # Return base64 encoded audio

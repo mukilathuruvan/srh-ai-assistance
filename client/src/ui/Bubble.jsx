@@ -1,8 +1,10 @@
-import React from "react";
+import { useMessages } from "@/providers/MessageContextProvider";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const Bubble = ({ message, model }) => {
+  const { speakMessage } = useMessages();
+
   const content =
     model === "gpt"
       ? parseGPTMessage(message.content)
@@ -26,6 +28,14 @@ const Bubble = ({ message, model }) => {
         )}
 
         <span>{content}</span>
+        {message.role === "assistant" && (
+          <button
+            className="text-blue-500 hover:underline"
+            onClick={() => speakMessage(message.content, "de")}
+          >
+            Listen
+          </button>
+        )}
       </div>
     </div>
   );
@@ -43,7 +53,11 @@ const parseGPTMessage = (content) => {
       const language = lines[0].replace(/```/g, "").trim();
       const code = lines.slice(1, -1).join("\n");
       return (
-        <SyntaxHighlighter key={index} language={language || "text"} style={tomorrow}>
+        <SyntaxHighlighter
+          key={index}
+          language={language || "text"}
+          style={tomorrow}
+        >
           {code}
         </SyntaxHighlighter>
       );
@@ -54,7 +68,11 @@ const parseGPTMessage = (content) => {
           if (/^#{2,3}\s/.test(line)) {
             // Header (h2 or h3)
             const level = line.startsWith("###") ? 3 : 2;
-            return React.createElement(`h${level}`, { key: i }, line.replace(/^#{2,3}\s/, ""));
+            return React.createElement(
+              `h${level}`,
+              { key: i },
+              line.replace(/^#{2,3}\s/, "")
+            );
           } else if (/^\d+\./.test(line)) {
             // Numbered list item
             return <li key={i}>{line.replace(/^\d+\.\s*/, "")}</li>;
@@ -81,7 +99,11 @@ const parseGeminiMessage = (content) => {
       const language = lines[0].replace(/```/g, "").trim();
       const code = lines.slice(1, -1).join("\n").trim();
       return (
-        <SyntaxHighlighter key={index} language={language || "text"} style={tomorrow}>
+        <SyntaxHighlighter
+          key={index}
+          language={language || "text"}
+          style={tomorrow}
+        >
           {code}
         </SyntaxHighlighter>
       );

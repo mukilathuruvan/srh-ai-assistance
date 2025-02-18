@@ -12,13 +12,16 @@ const MessageForm = () => {
   const [prompt, setPrompt] = useState("");
   const [file, setFile] = useState(null);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
-  const { addMessage } = useMessages();
+  const { addMessage, speakMessage } = useMessages();
 
   // Handle file selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile({ file: selectedFile, preview: URL.createObjectURL(selectedFile) });
+      setFile({
+        file: selectedFile,
+        preview: URL.createObjectURL(selectedFile),
+      });
     }
     setShowUploadMenu(false); // Hide menu after selection
   };
@@ -26,24 +29,31 @@ const MessageForm = () => {
   // Handle message submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!prompt.trim() && !file) return; // Prevent sending empty messages
+    speakMessage("welcome", "de");
+    // if (!prompt.trim() && !file) return; // Prevent sending empty messages
 
-    const formData = new FormData();
-    formData.append("prompt", prompt);
-    if (file) formData.append("file", file.file);
+    // const formData = new FormData();
+    // formData.append("prompt", prompt);
+    // if (file) formData.append("file", file.file);
 
-    addMessage({ role: "user", content: prompt }, formData);
+    // addMessage({ role: "user", content: prompt }, formData);
 
-    setPrompt(""); // Clear input
-    setFile(null); // Clear file selection
+    // setPrompt(""); // Clear input
+    // setFile(null); // Clear file selection
   };
 
   return (
-    <form className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t flex items-center gap-4" onSubmit={handleSubmit}>
-      
+    <form
+      className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t flex items-center gap-4"
+      onSubmit={handleSubmit}
+    >
       {/* Upload Button with Pop-up Menu */}
       <div className="relative">
-        <button type="button" onClick={() => setShowUploadMenu(!showUploadMenu)} className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+        <button
+          type="button"
+          onClick={() => setShowUploadMenu(!showUploadMenu)}
+          className="p-2 rounded-full bg-gray-200 hover:bg-gray-300"
+        >
           <FaPaperclip size={20} />
         </button>
 
@@ -52,15 +62,30 @@ const MessageForm = () => {
           <div className="absolute bottom-12 left-0 bg-white shadow-lg border rounded-lg p-2 flex flex-col gap-2">
             <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
               <FaImage /> Image
-              <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </label>
             <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
               <FaVideo /> Video
-              <input type="file" accept="video/*" className="hidden" onChange={handleFileChange} />
+              <input
+                type="file"
+                accept="video/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </label>
             <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
               <FaMicrophone /> Audio
-              <input type="file" accept="audio/*" className="hidden" onChange={handleFileChange} />
+              <input
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </label>
           </div>
         )}
@@ -79,7 +104,11 @@ const MessageForm = () => {
       {/* File Preview */}
       {file && (
         <div className="relative">
-          <img src={file.preview} alt="Uploaded" className="h-12 w-12 rounded-md object-cover" />
+          <img
+            src={file.preview}
+            alt="Uploaded"
+            className="h-12 w-12 rounded-md object-cover"
+          />
           <button
             className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
             onClick={() => setFile(null)}
@@ -93,7 +122,10 @@ const MessageForm = () => {
       {/* Send Button */}
       <Button
         type="submit"
-        className={cn("px-6 py-2 bg-blue-500 text-white rounded-lg", (!prompt && !file) && "opacity-50 cursor-not-allowed")}
+        className={cn(
+          "px-6 py-2 bg-blue-500 text-white rounded-lg",
+          !prompt && !file && "opacity-50 cursor-not-allowed"
+        )}
         disabled={!prompt && !file}
       >
         Send ➤

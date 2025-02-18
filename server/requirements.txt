@@ -7,6 +7,6 @@ requests
 mysql-connector-python
 gunicorn
 vertexai
-openai
 google-cloud-texttospeech
 google-cloud-translate==2.0.1
+openai==0.28

@@ -1,4 +1,4 @@
-from google.cloud import texttospeech, translate_v3 as translate
+from google.cloud import texttospeech, translate_v3 as translate, storage
 import os
 
 
@@ -49,3 +49,20 @@ def translate_text(text, language_code):
     except Exception as e:
         print(f"Translation Error: {e}")
         return "error during translation"
+
+
+def save_file(file):
+    """Saves the file to Cloud Storage and returns the public URL."""
+    try:
+        bucket_name = os.environ.get("GEMINI_BUCKET_NAME")
+
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+
+        blob = bucket.blob(file.filename)
+        blob.upload_from_file(file)
+
+        return f"https://storage.googleapis.com/{bucket_name}/{file.filename}"
+    except Exception as e:
+        print(f"Error saving to Cloud Storage: {e}")
+        return None

@@ -1,7 +1,8 @@
 import requests
+import os
 
 # Replace with your OpenAI API key
-api_key = ""
+api_key = os.getenv("OPEN_API_KEY")
 
 # File path to upload
 file_path = r"C:\Users\Adham Moursy\Desktop\openaidataset.jsonl"
@@ -10,15 +11,15 @@ file_path = r"C:\Users\Adham Moursy\Desktop\openaidataset.jsonl"
 url = "https://api.openai.com/v1/files"
 
 # Prepare the request
-files = {
-    'file': open(file_path, 'rb')
-}
+files = {"file": open(file_path, "rb")}
 data = {
-    'purpose': 'fine-tune'  # Change to 'assistants' if you're using the Assistants API
+    "purpose": "fine-tune"  # Change to 'assistants' if you're using the Assistants API
 }
 
 # Make the request
-response = requests.post(url, headers={"Authorization": f"Bearer {api_key}"}, files=files, data=data)
+response = requests.post(
+    url, headers={"Authorization": f"Bearer {api_key}"}, files=files, data=data
+)
 
 # Print the response
 print(response.json())

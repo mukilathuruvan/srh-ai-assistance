@@ -1,17 +1,18 @@
 import openai
+import os
 
 # Initialize the OpenAI client with your API key
-openai.api_key = ""
+openai.api_key = os.getenv("OPEN_API_KEY")
 
 # Create the fine-tuning job with DPO
-#job = openai.fine_tuning.jobs.create(
-   # training_file="file-8Q8Jy2TB3FoMRiEEKoFzyz",  # Replace with your file ID
-   # model="gpt-4o-mini-2024-07-18",
-    #method={
-        #"type": "supervised",
-        
-  #  }
-#)
+# job = openai.fine_tuning.jobs.create(
+# training_file="file-8Q8Jy2TB3FoMRiEEKoFzyz",  # Replace with your file ID
+# model="gpt-4o-mini-2024-07-18",
+# method={
+# "type": "supervised",
+
+#  }
+# )
 
 # Print the response
 # print(job)
@@ -24,7 +25,6 @@ status = openai.fine_tuning.jobs.retrieve(job_id)
 print("Job status:", status.status)
 
 
-
 # Your fine-tuning job ID
 job_id = "ftjob-qaKbplJr5W7KczhL7RIhtRJr"
 
@@ -35,18 +35,3 @@ job = openai.fine_tuning.jobs.retrieve(job_id)
 model_id = job.fine_tuned_model
 
 print(f"Fine-tuned Model ID: {model_id}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

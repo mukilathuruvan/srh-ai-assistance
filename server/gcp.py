@@ -34,7 +34,9 @@ def translate_text(text, language_code):
             return text
 
         client = translate.TranslationServiceClient()
-        parent = "projects/1050588545855/locations/global"
+        project_id = os.environ.get("GEMINI_PROJECT_ID")
+
+        parent = f"projects/{project_id}/locations/global"
 
         response = client.translate_text(
             contents=[text],

@@ -95,7 +95,7 @@ openai.api_key = os.getenv("OPEN_API_KEY")
 
 
 class AppOpenAI:
-    def _init_(self):
+    def __init__(self):
         self.client = openai.ChatCompletion
 
     def validate_prompt(self, prompt):
@@ -126,15 +126,12 @@ class AppOpenAI:
 
             response = self.client.create(
                 model="ft:gpt-4o-mini-2024-07-18:personal::B2IoJDWl",
-                model="ft:gpt-4o-mini-2024-07-18:personal::B2IoJDWl",
                 messages=[
                     {"role": "system", "content": system_instruction[0]},
-                    {"role": "user", "content": prompt},
                     {"role": "user", "content": prompt},
                 ],
                 max_tokens=8192,
                 temperature=1,
-                top_p=0.95,
                 top_p=0.95,
             )
 
@@ -142,7 +139,6 @@ class AppOpenAI:
             response_time = round(end_time - start_time, 2)
 
             return {
-                "content": response["choices"][0]["message"]["content"],
                 "content": response["choices"][0]["message"]["content"],
                 "response_time": response_time,
             }

@@ -24,8 +24,6 @@ def ask_ai():
         prompt = request.form.get("prompt")
         files = request.files.getlist("file")
 
-        print(f"Prompt: {prompt}")
-
         file = files[0] if files and len(files) > 0 else None
 
         if not prompt or len(prompt) == 0:
@@ -35,7 +33,6 @@ def ask_ai():
         app_chatgpt = AppOpenAI()
 
         if file:
-            print("File received")
             file_url = save_file(file)
             prompt = f"File {file_url} and Query {prompt}"
 

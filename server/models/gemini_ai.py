@@ -145,32 +145,10 @@ class AppGemini:
     def prepare_endpoint_path(self):
         return f"projects/{PROJECT_ID}/locations/{LOCATION}/endpoints/{APP_MODEL}"
 
-    def validate_prompt(self, prompt):
-        if not prompt:
-            raise ValueError("Prompt cannot be empty.")
-
-        if len(prompt) > 1000:
-            raise ValueError(
-                "Prompt is too long. Please keep it under 1000 characters."
-            )
-
-        if re.search(r"[^\w\s]", prompt):
-            raise ValueError(
-                "Prompt contains special characters. Please avoid using special characters."
-            )
-
-        if not prompt.strip():
-            raise ValueError("Prompt cannot be empty after removing whitespace.")
-
-        return True
-
     def generate_response(self, prompt: str):
         try:
             if not self.model:
                 self.initialize()
-
-            if not self.validate_prompt(prompt):
-                return None
 
             start_time = time.time()
             chat = self.model.start_chat()

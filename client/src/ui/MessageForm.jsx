@@ -39,12 +39,20 @@ const MessageForm = () => {
   };
 
   return (
-    <form className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t flex items-center gap-4" onSubmit={handleSubmit}>
+    <form
+      className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t flex items-center gap-4"
+      onSubmit={handleSubmit}
+    >
       {/* Attach Button */}
       <div className="relative">
         <label className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer">
           <FaPaperclip size={20} />
-          <input type="file" accept="image/*,video/*,audio/*,.pdf,.doc,.docx" className="hidden" onChange={handleFileChange} />
+          <input
+            type="file"
+            accept="video/*,.pdf"
+            className="hidden"
+            onChange={handleFileChange}
+          />
         </label>
       </div>
 
@@ -62,7 +70,11 @@ const MessageForm = () => {
       {file && (
         <div className="relative flex items-center">
           {file.file.type.startsWith("image") ? (
-            <img src={file.preview} alt="Uploaded" className="h-12 w-12 rounded-md object-cover" />
+            <img
+              src={file.preview}
+              alt="Uploaded"
+              className="h-12 w-12 rounded-md object-cover"
+            />
           ) : (
             <span className="text-sm text-gray-700">{file.file.name}</span>
           )}

@@ -1,5 +1,6 @@
 from google.cloud import texttospeech, translate_v3 as translate, storage
 import os
+import time
 
 
 client = texttospeech.TextToSpeechClient()
@@ -61,10 +62,11 @@ def save_file(file):
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
 
-        blob = bucket.blob(file.filename)
+        timestamp = str(int(time.time()))
+        filename = f"{timestamp}_{file.filename}"
+
+        blob = bucket.blob(filename)
         blob.upload_from_file(file)
 
-        return f"https://storage.googleapis.com/{bucket_name}/{file.filename}"
     except Exception as e:
         print(f"Error saving to Cloud Storage: {e}")
-        return None

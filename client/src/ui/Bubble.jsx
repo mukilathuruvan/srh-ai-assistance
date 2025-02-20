@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import LanguageList from "./LanguageList";
+import React from "react";
 
 const Bubble = ({ message, model }) => {
   const [chosenMessage, setChosenMessage] = useState(null);

@@ -5,6 +5,7 @@ from gcp import synthesize_speech, translate_text, save_file
 import base64
 from models.gemini_ai import AppGemini
 from models.chatgpt.chatgpt import AppOpenAI
+from util import read_file
 
 
 app = Flask(__name__)
@@ -33,8 +34,10 @@ def ask_ai():
         app_chatgpt = AppOpenAI()
 
         if file:
-            file_url = save_file(file)
-            prompt = f"File {file_url} and Query {prompt}"
+            save_file(file)
+
+            file_content = read_file(file)
+            prompt = f"{file_content}\n\nQuery: {prompt}"
 
         gemini_response = app_gemini.generate_response(prompt)
         gpt_response = app_chatgpt.generate_response(prompt)

@@ -98,29 +98,8 @@ class AppOpenAI:
     def __init__(self):
         self.client = openai.ChatCompletion
 
-    def validate_prompt(self, prompt):
-        if not prompt:
-            raise ValueError("Prompt cannot be empty.")
-
-        if len(prompt) > 1000:
-            raise ValueError(
-                "Prompt is too long. Please keep it under 1000 characters."
-            )
-
-        if re.search(r"[^\w\s]", prompt):
-            raise ValueError(
-                "Prompt contains special characters. Please avoid using special characters."
-            )
-
-        if not prompt.strip():
-            raise ValueError("Prompt cannot be empty after removing whitespace.")
-
-        return True
-
     def generate_response(self, prompt: str):
         try:
-            if not self.validate_prompt(prompt):
-                return None
 
             start_time = time.time()
 

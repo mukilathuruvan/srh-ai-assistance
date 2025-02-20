@@ -1,7 +1,7 @@
 "use client";
 
 import { chatWithBot, convertToAudio } from "@/api";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 
 const ChatsContext = createContext({});
 
@@ -10,6 +10,8 @@ export function MessagesProvider({ children }) {
   const [geminiMessages, setGeminiMessages] = useState([]);
 
   const [isLoadingAnswer, setIsLoadingAnswer] = useState(false);
+
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const initializeChat = () => {
@@ -60,10 +62,16 @@ export function MessagesProvider({ children }) {
       const data = await convertToAudio(message, language);
       if (!data) return;
 
-      const audio = new Audio(`data:audio/mpeg;base64,${data.audio}`);
-      audio.play();
+      audioRef.current = new Audio(`data:audio/mpeg;base64,${data.audio}`);
+      audioRef.current.play();
     } catch (error) {
       console.error("Error playing audio:", error);
+    }
+  };
+
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
     }
   };
 
@@ -75,6 +83,7 @@ export function MessagesProvider({ children }) {
         addMessage,
         isLoadingAnswer,
         speakMessage,
+        stopSpeaking,
       }}
     >
       {children}

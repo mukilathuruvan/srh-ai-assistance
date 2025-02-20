@@ -28,9 +28,10 @@ const LANGUAGES = [
 ];
 
 const LanguageList = ({ chosenMessage, onClose }) => {
-  const { speakMessage } = useMessages();
+  const { speakMessage, stopSpeaking } = useMessages();
 
   const onLanguageClick = (language) => {
+    stopSpeaking();
     speakMessage(chosenMessage, language);
   };
 
@@ -48,7 +49,10 @@ const LanguageList = ({ chosenMessage, onClose }) => {
         </li>
       ))}
       <li
-        onClick={onClose}
+        onClick={() => {
+          onClose();
+          stopSpeaking();
+        }}
         className="bg-red-200 rounded-full px-2 py-1 cursor-pointer hover:bg-red-300 text-gray-800"
       >
         Close

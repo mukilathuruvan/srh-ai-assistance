@@ -34,3 +34,21 @@ export const convertToAudio = async (text, language) => {
     return null;
   }
 };
+
+export const processVideo = async (videoUrl) => {
+  try {
+    const response = await fetch(`${API_URL}/video`, {
+      method: "POST",
+      body: JSON.stringify({ videoUrl }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};

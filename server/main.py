@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
-from gcp import synthesize_speech, translate_text, save_file
+from gcp import synthesize_speech, translate_text, save_file, detect_faces
 import base64
 from models.gemini_ai import AppGemini
 from models.chatgpt.chatgpt import AppOpenAI
@@ -80,6 +80,23 @@ def speak():
     except Exception as e:
         print(f"Error synthesizing speech: {e}")
         return jsonify({"error": "Error synthesizing speech"}), 500
+
+
+@app.route("/api/video", methods=["POST"])
+def video():
+    data = request.json
+    url = data.get("videoUrl")
+
+    if not url:
+        return jsonify({"error": "No videoUrl provided"}), 400
+
+    try:
+        face_data = detect_faces(url)
+        return jsonify({"data": face_data}), 200
+
+    except Exception as e:
+        print(f"Error video analysis: {e}")
+        return jsonify({"error": "Error video analysis"}), 500
 
 
 if __name__ == "__main__":
